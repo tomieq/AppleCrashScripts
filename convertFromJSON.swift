@@ -62,7 +62,15 @@ final class CrashTranslator {
             let address = frame["imageOffset"].intValue + binaryImage["base"].intValue
             content.append("%d".format(id).padding(length: 5))
             content.append(binaryImage["name"].stringValue.padding(length: 40))
-            content.append("0x%llx 0x%llx + %d".format(address, binaryImage["base"].int64Value, frame["imageOffset"].intValue))
+            content.append("0x%llx ".format(address))
+            if let symbol = frame["symbol"].string, let symbolLocation = frame["symbolLocation"].int {
+                content.append("\(symbol) + \(symbolLocation)")
+            } else {
+                content.append("0x%llx + %d".format(binaryImage["base"].int64Value, frame["imageOffset"].intValue))
+            }
+            if let sourceFile = frame["sourceFile"].string, let sourceLine = frame["sourceLine"].int {
+                content.append(" (\(sourceFile):\(sourceLine))")
+            }
             content.append("\n")
         }
         return content
@@ -71,9 +79,9 @@ final class CrashTranslator {
     private func buildBinaryImages(_ binaryImages: JSON) -> String {
         var content = "\nBinary Images:\n"
         for image in binaryImages.arrayValue {
-            content.append("0x%llx - 0x%llx ".format(image["base"].intValue, image["base"].intValue + image["size"].intValue))
+            content.append("0x%llx - 0x%llx ".format(image["base"].intValue, image["base"].intValue + image["size"].intValue - 1))
             content.append("%@ %@ ".format(image["name"].stringValue, image["arch"].stringValue))
-            content.append("<%@> %@\n".format(image["uuid"].stringValue, image["path"].stringValue))
+            content.append("<%@> %@\n".format(image["uuid"].stringValue.replacingOccurrences(of: "-", with: ""), image["path"].stringValue))
         }
         return content
     }
