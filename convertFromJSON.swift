@@ -99,6 +99,7 @@ final class CrashTranslator {
             content.append("Version:             %@ (%@)\n"
                             .format(bundleInfo["CFBundleShortVersionString"].stringValue, bundleInfo["CFBundleVersion"].stringValue))
         }
+        content.append("Report Version:      104\n")
         content.append("Code Type:           %@ (Native(?))\n".format(payload["cpuType"].stringValue))
         content.append("Role:                %@\n".format(payload["procRole"].stringValue))
         content.append("Parent Process:      %@ [%@]\n".format(payload["parentProc"].stringValue, payload["parentPid"].stringValue))
